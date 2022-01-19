@@ -6,11 +6,12 @@ import { findCycles } from './findCycles'
 
 function considerFile(file: string): boolean {
   return (file.endsWith('.ts') || file.endsWith('.tsx')) &&
-         !file.endsWith('.stories.tsx')
+         !file.endsWith('.stories.tsx') && !file.endsWith('.test.tsx') && !file.endsWith('.test.ts') && !file.endsWith('.d.ts')
 }
 
 function hasUncheckedImport(file: string, importsTracker: ImportTracker, checkedFiles: Set<string>): boolean {
   const imports = importsTracker.getImports(file)
+
   for (const imp of imports) {
     if (!checkedFiles.has(imp)) {
       return true
@@ -107,8 +108,8 @@ export async function getCheckedFiles(tsconfigPath: string, srcRoot: string): Pr
 
   const set = new Set<string>();
 
-  await Promise.all(tsconfig.include.map(file => {
-    return new Promise((resolve, reject) => {
+  await Promise.all((tsconfig.include || []).map(file => {
+    return new Promise<void>((resolve, reject) => {
       glob(path.join(srcRoot, file), (err, files) => {
         if (err) {
           return reject(err)
@@ -124,15 +125,15 @@ export async function getCheckedFiles(tsconfigPath: string, srcRoot: string): Pr
     });
   }));
 
-  await Promise.all(tsconfig.exclude.map(file => {
-    return new Promise((resolve, reject) => {
+  await Promise.all((tsconfig.exclude || []).map(file => {
+    return new Promise<void>((resolve, reject) => {
       glob(path.join(srcRoot, file), (err, files) => {
         if (err) {
           return reject(err)
         }
 
         for (const file of files) {
-          set.delete(file)
+          set.add(file)
         }
         resolve()
       })

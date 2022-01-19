@@ -16,7 +16,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
       console.warn(`Warning: Barrel import: ${path.relative(srcRoot, file)}`)
       file = index
     } else {
-      throw new Error(`Warning: Importing a directory without an index.ts file: ${path.relative(srcRoot, file)}`)
+      console.warn(`Warning: Importing a directory without an index.ts file: ${path.relative(srcRoot, file)}`)
+      return [];
     }
   }
 
@@ -45,6 +46,7 @@ export function getImportsForFile(file: string, srcRoot: string) {
       if (fs.existsSync(`${fileName}`)) {
         return fileName
       }
+
       console.warn(`Warning: Unresolved import ${path.relative(srcRoot, fileName)} ` +
                    `in ${path.relative(srcRoot, file)}`)
       return null
@@ -63,7 +65,7 @@ export class ImportTracker {
     if (this.imports.has(file)) {
       return this.imports.get(file)
     }
-    const imports = getImportsForFile(file, this.srcRoot)
+    const imports = getImportsForFile(file, this.srcRoot + '/src/')
     this.imports.set(file, imports)
     return imports
   }

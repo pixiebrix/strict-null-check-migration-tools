@@ -36,18 +36,16 @@ export class ErrorCounter {
         if (match) {
           this.tscProcess.stdout.removeListener('data', listener)
           const errorCount = +match[1]
-          resolve(errorCount)
+          resolve(errorCount);
         }
       }
 
       this.tscProcess.stdout.on('data', listener)
 
-      // Create a new config with the file removed from excludes
-      const exclude = new Set(this.originalConfig.exclude)
-      exclude.delete('./' + relativeFilePath)
+      // Create a new config with the file added to files
       fs.writeFileSync(this.tsconfigCopyPath, JSON.stringify({
         ...this.originalConfig,
-        exclude: [...exclude],
+        files: [...this.originalConfig.files, './' + relativeFilePath]
       }, null, 2))
     })
   }

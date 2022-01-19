@@ -46,7 +46,7 @@ async function tryAutoAddStrictNulls() {
 function addFileToConfig(relativeFilePath: string) {
   const config = JSON.parse(fs.readFileSync(tsconfigPath).toString())
   const path = `./${relativeFilePath}`
-  const excludeIndex = config.exclude.indexOf(path)
+  const excludeIndex = (config.exclude || []).indexOf(path)
   if (excludeIndex >= 0) {
     config.exclude.splice(excludeIndex, 1)
   } else {
