@@ -6,7 +6,6 @@ import * as ts from "typescript";
  * Given a file, return the list of files it imports as absolute paths.
  */
 export function getImportsForFile(file: string, srcRoot: string) {
-  // srcRoot = srcRoot.replace("/src/src/", "/src/");
   // Follow symlink so directory check works.
   file = fs.realpathSync(file);
 
@@ -40,7 +39,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.endsWith(".scss") &&
           !fileName.endsWith(".yaml") &&
           !fileName.endsWith(".png") &&
-          !fileName.endsWith("loadAsComponent")
+          !fileName.endsWith("loadAsComponent") &&
+          !fileName.endsWith("loadAsUrl")
       )
       // Assume .js/.jsx imports have a .d.ts available
       .filter(
@@ -62,15 +62,24 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.startsWith("@cfworker") &&
           !fileName.startsWith("idb/") &&
           !fileName.startsWith("@apidevtools/") &&
-          !fileName.startsWith("redux-")
+          !fileName.startsWith("redux-") &&
+          !fileName.startsWith("primereact/") &&
+          !fileName.startsWith("@atlaskit/") &&
+          !fileName.startsWith("type-fest") &&
+          !fileName.startsWith("formik/")
       )
       .map((fileName) => {
+        // join relative imports
         if (/(^\.\/)|(^\.\.\/)/.test(fileName)) {
           return path.join(path.dirname(file), fileName);
         }
-        return path.join(srcRoot, fileName).replace("@/", "");
+        // handle absolute imports
+        return path.join(srcRoot, fileName);
       })
       .map((fileName) => {
+        if (fileName.includes("/@/")) {
+          fileName = fileName.replace("/@/", "/");
+        }
         if (fs.existsSync(`${fileName}.ts`)) {
           return `${fileName}.ts`;
         }
@@ -106,7 +115,7 @@ export class ImportTracker {
     if (this.imports.has(file)) {
       return this.imports.get(file);
     }
-    const imports = getImportsForFile(file, this.srcRoot + "/src/");
+    const imports = getImportsForFile(file, this.srcRoot + "/");
     this.imports.set(file, imports);
     return imports;
   }
