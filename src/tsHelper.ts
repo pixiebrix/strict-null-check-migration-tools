@@ -66,7 +66,19 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.startsWith("primereact/") &&
           !fileName.startsWith("@atlaskit/") &&
           !fileName.startsWith("type-fest") &&
-          !fileName.startsWith("formik/")
+          !fileName.startsWith("formik/") &&
+          !fileName.startsWith("intro.js") &&
+          !fileName.startsWith("use-sync-external-store") &&
+          !fileName.startsWith("@xobotyi/") &&
+          !fileName.startsWith("@mozilla") &&
+          !fileName.startsWith("@popperjs") &&
+          !fileName.startsWith("@floating-ui") &&
+          !fileName.startsWith("regenerator-runtime") &&
+          !fileName.startsWith("@uipath") &&
+          !fileName.startsWith("@datadog") &&
+          !fileName.startsWith("cooky-cutter/") &&
+          !fileName.startsWith("fake-indexeddb") &&
+          !fileName.startsWith("iframe-resizer")
       )
       .map((fileName) => {
         // join relative imports
