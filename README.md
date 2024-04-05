@@ -31,6 +31,13 @@ Trying to auto add 'figma_app/views/cart/number_of_editors.tsx' (file 27/48)
 ...
 ```
 
+### Note:
+
+- This script uses `tsc --watch`, but the file system does not always inform the watcher of file changes. This can lead to the `auto-add` script hanging.
+- To fix this, in a separate terminal window, in the Extension project, run `touch tsconfig.json`. This should unfreeze the `auto-add` script.
+
+  - You may have to do this multiple times before the script finishes running.
+
 - `npm run find-cycles -- <your_project_path>/tsconfig.json` finds all dependency cycles that need to be strict null checked together. Generates an output like this:
 
 ```
