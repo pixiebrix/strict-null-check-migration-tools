@@ -6,6 +6,8 @@ These scripts were originally forked from https://github.com/mjbvz/vscode-strict
 
 These are scripts used in the incremental migration approach described in [https://www.figma.com/blog/inside-figma-a-case-study-on-strict-null-checks/].
 
+## Find Candidates
+
 - `npm run find-candidates -- <your_project_path>/tsconfig.strictNullChecks.json` lists all the files whose dependencies have all been whitelisted. These files can be safely whitelisted too (once their strict null check errors have been fixed). It generates an output like this:
 
 ```
@@ -17,6 +19,8 @@ The dependency count is approximate (this script only resolves up to third order
 - [ ] `"./figma_app/views/file_browser/file_action_dropdown.tsx"` — Depended on by >**14** files (8 direct imports)
 ...
 ```
+
+## Auto Add Files
 
 - `npm run auto-add -- <your_project_path>/tsconfig.strictNullChecks.json` tries to automatically add to `tsconfig.strictNullChecks.json` every file that can already compile with strictNullChecks without further modifications. It generates an output like this:
 
@@ -38,6 +42,8 @@ Trying to auto add 'figma_app/views/cart/number_of_editors.tsx' (file 27/48)
 
   - You may have to do this multiple times before the script finishes running.
 
+## Find Dependency Cycles
+
 - `npm run find-cycles -- <your_project_path>/tsconfig.json` finds all dependency cycles that need to be strict null checked together. Generates an output like this:
 
 ```
@@ -57,8 +63,6 @@ Files not part of a strongly connected components (1974)
 ...
 ```
 
+## Visualize Progress
+
 - `npm run visualize` generates visualization data for strict null check progress in `data.js`. In order to view that data, open `progress.html`, a self-contained HTML file. You can also run a more expensive version of this script `npm run visualize -- --countErrors` that tells you how many errors are needed to fix each eligible file, though it takes a long time to run because it needs to compile the codebase multiple times.
-
-# Contributions
-
-Contributions to this repository are not accepted. Since Figma has already completed their migration, our codebase is no longer in a state where we can test these scripts, so we're unable to review patches for correctness. We expect that every codebase will have its unique quirks that will require adapting the scripts anyway, even if it's just changing some file path resolution code. You're better off just forking this repo.
