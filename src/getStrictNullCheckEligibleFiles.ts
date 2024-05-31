@@ -6,12 +6,7 @@ import { findCycles } from "./findCycles";
 
 function considerFile(file: string): boolean {
   return (
-    file.endsWith(".ts") ||
-    file.endsWith(".tsx") ||
-    file.endsWith(".stories.tsx") ||
-    file.endsWith(".test.tsx") ||
-    file.endsWith(".test.ts") ||
-    (file.endsWith(".spec.ts") && !file.endsWith(".d.ts"))
+    file.endsWith(".ts") || (file.endsWith(".tsx") && !file.endsWith(".d.ts"))
   );
 }
 

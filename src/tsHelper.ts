@@ -41,7 +41,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.endsWith(".png") &&
           !fileName.endsWith("loadAsComponent") &&
           !fileName.endsWith("loadAsUrl") &&
-          !fileName.endsWith("loadAsText"),
+          !fileName.endsWith("loadAsText") &&
+          !fileName.endsWith(".txt"),
       )
       // Assume .js/.jsx imports have a .d.ts available
       .filter(
