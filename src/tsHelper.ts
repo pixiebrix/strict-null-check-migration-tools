@@ -19,8 +19,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
       console.warn(
         `Warning: Importing a directory without an index.ts file: ${path.relative(
           srcRoot,
-          file
-        )}`
+          file,
+        )}`,
       );
       return [];
     }
@@ -40,11 +40,12 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.endsWith(".yaml") &&
           !fileName.endsWith(".png") &&
           !fileName.endsWith("loadAsComponent") &&
-          !fileName.endsWith("loadAsUrl")
+          !fileName.endsWith("loadAsUrl") &&
+          !fileName.endsWith("loadAsText"),
       )
       // Assume .js/.jsx imports have a .d.ts available
       .filter(
-        (fileName) => !fileName.endsWith(".js") && !fileName.endsWith(".jsx")
+        (fileName) => !fileName.endsWith(".js") && !fileName.endsWith(".jsx"),
       )
       // remove node modules (the import must contain '/')
       .filter((x) => /\//.test(x))
@@ -78,7 +79,14 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.startsWith("@datadog") &&
           !fileName.startsWith("cooky-cutter/") &&
           !fileName.startsWith("fake-indexeddb") &&
-          !fileName.startsWith("iframe-resizer")
+          !fileName.startsWith("iframe-resizer") &&
+          !fileName.startsWith("webextension-polyfill") &&
+          !fileName.startsWith("ace-builds") &&
+          !fileName.startsWith("@vespaiach/") &&
+          !fileName.startsWith("@pixiebrix/") &&
+          !fileName.startsWith("@storybook/") &&
+          !fileName.startsWith("@sinonjs/") &&
+          !fileName.startsWith("@shopify/"),
       )
       .map((fileName) => {
         // join relative imports
@@ -107,7 +115,7 @@ export function getImportsForFile(file: string, srcRoot: string) {
 
         console.warn(
           `Warning: Unresolved import ${path.relative(srcRoot, fileName)} ` +
-            `in ${path.relative(srcRoot, file)}`
+            `in ${path.relative(srcRoot, file)}`,
         );
         return null;
       })

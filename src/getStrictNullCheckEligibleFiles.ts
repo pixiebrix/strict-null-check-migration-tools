@@ -1,35 +1,45 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import * as glob from 'glob'
-import { ImportTracker } from './tsHelper'
-import { findCycles } from './findCycles'
+import * as fs from "fs";
+import * as path from "path";
+import * as glob from "glob";
+import { ImportTracker } from "./tsHelper";
+import { findCycles } from "./findCycles";
 
 function considerFile(file: string): boolean {
-  return (file.endsWith('.ts') || file.endsWith('.tsx')) &&
-         !file.endsWith('.stories.tsx') && !file.endsWith('.test.tsx') && !file.endsWith('.test.ts') && !file.endsWith('.d.ts')
+  return (
+    file.endsWith(".ts") ||
+    file.endsWith(".tsx") ||
+    file.endsWith(".stories.tsx") ||
+    file.endsWith(".test.tsx") ||
+    file.endsWith(".test.ts") ||
+    (file.endsWith(".spec.ts") && !file.endsWith(".d.ts"))
+  );
 }
 
-function hasUncheckedImport(file: string, importsTracker: ImportTracker, checkedFiles: Set<string>): boolean {
-  const imports = importsTracker.getImports(file)
+function hasUncheckedImport(
+  file: string,
+  importsTracker: ImportTracker,
+  checkedFiles: Set<string>,
+): boolean {
+  const imports = importsTracker.getImports(file);
 
   for (const imp of imports) {
     if (!checkedFiles.has(imp)) {
-      return true
+      return true;
     }
   }
-  return false
+  return false;
 }
 
 export function forEachFileInSrc(srcRoot: string): Promise<string[]> {
   return new Promise((resolve, reject) => {
     glob(`${srcRoot}/**/*.ts?(x)`, (err, files) => {
       if (err) {
-        return reject(err)
+        return reject(err);
       }
 
-      return resolve(files.filter(considerFile))
-    })
-  })
+      return resolve(files.filter(considerFile));
+    });
+  });
 }
 
 /**
@@ -38,17 +48,17 @@ export function forEachFileInSrc(srcRoot: string): Promise<string[]> {
  */
 export async function listStrictNullCheckEligibleFiles(
   srcRoot: string,
-  checkedFiles: Set<string>): Promise<string[]> {
+  checkedFiles: Set<string>,
+): Promise<string[]> {
+  const importsTracker = new ImportTracker(srcRoot);
 
-  const importsTracker = new ImportTracker(srcRoot)
-
-  const files = await forEachFileInSrc(srcRoot)
-  return files.filter(file => {
+  const files = await forEachFileInSrc(srcRoot);
+  return files.filter((file) => {
     if (checkedFiles.has(file)) {
-      return false
+      return false;
     }
-    return !hasUncheckedImport(file, importsTracker, checkedFiles)
-  })
+    return !hasUncheckedImport(file, importsTracker, checkedFiles);
+  });
 }
 
 /**
@@ -57,94 +67,103 @@ export async function listStrictNullCheckEligibleFiles(
  */
 export async function listStrictNullCheckEligibleCycles(
   srcRoot: string,
-  checkedFiles: Set<string>): Promise<string[][]> {
+  checkedFiles: Set<string>,
+): Promise<string[][]> {
+  const importsTracker = new ImportTracker(srcRoot);
 
-  const importsTracker = new ImportTracker(srcRoot)
-
-  const files = await forEachFileInSrc(srcRoot)
-  const cycles = findCycles(srcRoot, files)
-  return cycles.filter(filesInCycle => {
+  const files = await forEachFileInSrc(srcRoot);
+  const cycles = findCycles(srcRoot, files);
+  return cycles.filter((filesInCycle) => {
     // A single file is not a cycle
     if (filesInCycle.length <= 1) {
-      return false
+      return false;
     }
 
-    let cycleIsChecked = true
+    let cycleIsChecked = true;
     for (const file of filesInCycle) {
       if (!checkedFiles.has(file)) {
-        cycleIsChecked = false
-        break
+        cycleIsChecked = false;
+        break;
       }
     }
 
     // The whole cycle has already been whitelisted
     if (cycleIsChecked) {
-      return false
+      return false;
     }
 
     // All imports of all files in the cycle must have
     // been whitelisted for the cycle to be eligible
     for (const file of files) {
       if (hasUncheckedImport(file, importsTracker, checkedFiles)) {
-        return false
+        return false;
       }
     }
-    return true
-  })
+    return true;
+  });
 }
 
 interface TSConfig {
-  files: string[]
-  include: string[]
-  exclude: string[]
+  files: string[];
+  include: string[];
+  exclude: string[];
 }
 
 /**
  * This function returns the list of files that have already been whitelisted into
  * --strictNullChecks.
  */
-export async function getCheckedFiles(tsconfigPath: string, srcRoot: string): Promise<Set<string>> {
-  const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath).toString()) as TSConfig
+export async function getCheckedFiles(
+  tsconfigPath: string,
+  srcRoot: string,
+): Promise<Set<string>> {
+  const tsconfig = JSON.parse(
+    fs.readFileSync(tsconfigPath).toString(),
+  ) as TSConfig;
 
   const set = new Set<string>();
 
-  await Promise.all((tsconfig.include || []).map(file => {
-    return new Promise<void>((resolve, reject) => {
-      glob(path.join(srcRoot, file), (err, files) => {
-        if (err) {
-          return reject(err)
-        }
-
-        for (const file of files) {
-          if (considerFile(file)) {
-            set.add(file)
+  await Promise.all(
+    (tsconfig.include || []).map((file) => {
+      return new Promise<void>((resolve, reject) => {
+        glob(path.join(srcRoot, file), (err, files) => {
+          if (err) {
+            return reject(err);
           }
-        }
-        resolve()
-      })
-    });
-  }));
 
-  await Promise.all((tsconfig.exclude || []).map(file => {
-    return new Promise<void>((resolve, reject) => {
-      glob(path.join(srcRoot, file), (err, files) => {
-        if (err) {
-          return reject(err)
-        }
+          for (const file of files) {
+            if (considerFile(file)) {
+              set.add(file);
+            }
+          }
+          resolve();
+        });
+      });
+    }),
+  );
 
-        for (const file of files) {
-          set.add(file)
-        }
-        resolve()
-      })
-    });
-  }));
+  await Promise.all(
+    (tsconfig.exclude || []).map((file) => {
+      return new Promise<void>((resolve, reject) => {
+        glob(path.join(srcRoot, file), (err, files) => {
+          if (err) {
+            return reject(err);
+          }
 
-  (tsconfig.files || []).forEach(include => {
+          for (const file of files) {
+            set.add(file);
+          }
+          resolve();
+        });
+      });
+    }),
+  );
+
+  (tsconfig.files || []).forEach((include) => {
     if (considerFile(include)) {
-      set.add(path.join(srcRoot, include))
+      set.add(path.join(srcRoot, include));
     }
   });
 
-  return set
+  return set;
 }
