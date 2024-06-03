@@ -92,7 +92,10 @@ export function getImportsForFile(file: string, srcRoot: string) {
       .map((fileName) => {
         // join relative imports
         if (/(^\.\/)|(^\.\.\/)/.test(fileName)) {
-          return path.join(path.dirname(file), fileName);
+          const newPath = path.resolve(srcRoot, path.dirname(file), fileName);
+          const relativePath = path.relative(srcRoot, newPath);
+          const joinedPath = path.join(srcRoot, relativePath);
+          return joinedPath;
         }
         // handle absolute imports
         return path.join(srcRoot, fileName);

@@ -5,9 +5,7 @@ import { ImportTracker } from "./tsHelper";
 import { findCycles } from "./findCycles";
 
 function considerFile(file: string): boolean {
-  return (
-    (file.endsWith(".ts") || file.endsWith(".tsx")) && !file.endsWith(".d.ts")
-  );
+  return file.endsWith(".ts") || file.endsWith(".tsx");
 }
 
 function hasUncheckedImport(

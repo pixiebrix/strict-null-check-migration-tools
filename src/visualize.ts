@@ -46,7 +46,7 @@ async function summary() {
     ...(await listStrictNullCheckEligibleFiles(srcRoot, checkedFiles)),
     ...(await listStrictNullCheckEligibleCycles(srcRoot, checkedFiles)).reduce(
       (a, b) => a.concat(b),
-      []
+      [],
     ),
   ]);
   const importTracker = new ImportTracker(srcRoot);
@@ -57,7 +57,7 @@ async function summary() {
   }
 
   console.log(
-    `Current strict null checking progress ${checkedFiles.size}/${allFiles.length}`
+    `Current strict null checking progress ${checkedFiles.size}/${allFiles.length}`,
   );
   console.log(`Current eligible file count: ${eligibleFiles.size}`);
 
@@ -127,14 +127,14 @@ async function summary() {
 
   fs.writeFileSync(
     path.join(process.cwd(), "data.js"),
-    `window.nodes = ${JSON.stringify(nodes)}`
+    `window.nodes = ${JSON.stringify(nodes)}`,
   );
 }
 
 function makeDependenciesLists(
   nodes: DependencyNode[],
   fileToNodeMap: Map<string, DependencyNode>,
-  importTracker: ImportTracker
+  importTracker: ImportTracker,
 ) {
   for (const node of nodes) {
     for (const file of node.files) {
@@ -157,7 +157,7 @@ function makeDependenciesLists(
 function makeDependentsLists(
   nodes: DependencyNode[],
   fileToNodeMap: Map<string, DependencyNode>,
-  importTracker: ImportTracker
+  importTracker: ImportTracker,
 ) {
   for (const node of nodes) {
     for (const file of node.files) {
