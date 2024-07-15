@@ -24,7 +24,7 @@ async function tryAutoAddStrictNulls() {
 
     const eligibleFiles = await listStrictNullCheckEligibleFiles(
       srcRoot,
-      checkedFiles
+      checkedFiles,
     );
 
     errorCounter.start();
@@ -33,10 +33,11 @@ async function tryAutoAddStrictNulls() {
       console.log(
         `Trying to auto add '${relativeFilePath}' (file ${i + 1}/${
           eligibleFiles.length
-        })`
+        })`,
       );
 
       const errorCount = await errorCounter.tryCheckingFile(relativeFilePath);
+      console.log(`Errors: ${errorCount}`);
       if (errorCount === 0) {
         console.log(`👍`);
         addFileToConfig(relativeFilePath);
@@ -60,7 +61,7 @@ function addFileToConfig(relativeFilePath: string) {
     config.exclude.splice(excludeIndex, 1);
   } else {
     config.files = Array.from(
-      new Set(config.files.concat(`./${relativeFilePath}`).sort())
+      new Set(config.files.concat(`./${relativeFilePath}`).sort()),
     );
   }
   fs.writeFileSync(tsconfigPath, JSON.stringify(config, null, 2));
