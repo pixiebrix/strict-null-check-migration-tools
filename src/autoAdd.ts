@@ -37,7 +37,6 @@ async function tryAutoAddStrictNulls() {
       );
 
       const errorCount = await errorCounter.tryCheckingFile(relativeFilePath);
-      console.log(`Errors: ${errorCount}`);
       if (errorCount === 0) {
         console.log(`👍`);
         addFileToConfig(relativeFilePath);
