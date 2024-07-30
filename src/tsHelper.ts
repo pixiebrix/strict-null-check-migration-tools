@@ -87,7 +87,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.startsWith("@pixiebrix/") &&
           !fileName.startsWith("@storybook/") &&
           !fileName.startsWith("@sinonjs/") &&
-          !fileName.startsWith("@shopify/"),
+          !fileName.startsWith("@shopify/") &&
+          !fileName.startsWith("@szhsin/react-menu"),
       )
       .map((fileName) => {
         // join relative imports
