@@ -89,7 +89,13 @@ export function getImportsForFile(file: string, srcRoot: string) {
           !fileName.startsWith("@sinonjs/") &&
           !fileName.startsWith("@shopify/") &&
           !fileName.startsWith("@szhsin/react-menu") &&
-          !fileName.startsWith("@deepgram/sdk"),
+          !fileName.startsWith("@deepgram/sdk") &&
+          !fileName.startsWith("@/") &&
+          !fileName.startsWith("@faker-js/") &&
+          !fileName.startsWith("semver/") &&
+          !fileName.startsWith("@json2csv/") &&
+          !fileName.startsWith("date-fns/") &&
+          !fileName.startsWith("@nivo/"),
       )
       .map((fileName) => {
         // join relative imports
@@ -103,8 +109,8 @@ export function getImportsForFile(file: string, srcRoot: string) {
         return path.join(srcRoot, fileName);
       })
       .map((fileName) => {
-        if (fileName.includes("/@/")) {
-          fileName = fileName.replace("/@/", "/");
+        if (fileName.includes("/@app/")) {
+          fileName = fileName.replace("/@app/", "/");
         }
         if (fs.existsSync(`${fileName}.ts`)) {
           return `${fileName}.ts`;
