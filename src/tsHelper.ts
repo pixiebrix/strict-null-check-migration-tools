@@ -110,7 +110,7 @@ export function getImportsForFile(file: string, srcRoot: string) {
       })
       .map((fileName) => {
         if (fileName.includes("/@app/")) {
-          fileName = fileName.replace("/@app/", "/");
+          fileName = fileName.replace("/@app/", "/src/");
         }
         if (fs.existsSync(`${fileName}.ts`)) {
           return `${fileName}.ts`;
